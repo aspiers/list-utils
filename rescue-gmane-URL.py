@@ -2,9 +2,10 @@
 
 import argparse
 import nntplib
-from urllib.parse import urlparse
+from urllib.parse import urlparse, unquote
 import urllib.request
 import os
+import re
 import sys
 
 TESTCASES = [
@@ -93,7 +94,13 @@ def rescue(parser, args, server, url):
     if "gmane.org" not in parsed_url.netloc:
         parser.error("Must be a gmane URL")
 
-    _, group, article, *_rest = parsed_url.path.split("/")
+    _, group, article, *rest = parsed_url.path.split("/")
+    for r in rest:
+        m = re.match("focus=(\d+)", unquote(r))
+        if m:
+            article = m.group(1)
+            break
+            print(article)
 
     if not group.startswith("gmane."):
         parser.error(
